@@ -232,7 +232,7 @@ var draw = function () {
     vertex(multipoints[0].x, multipoints[0].y);
     endShape();
 
-    if (iterations < 5) {
+    if (iterations < 5 && multipoints.length < 1000) {
       subdivide();
       iterations++;
     }
