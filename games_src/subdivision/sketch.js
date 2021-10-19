@@ -4,6 +4,7 @@
 
 var points = [];
 var multipoints = [];
+var oldpoints = [];
 var p2 = [];
 var numPoints = 0;
 var done = 0;
@@ -80,6 +81,16 @@ var mouseClicked = function () {
     else if (done === 3) {
       done = 2;
     }
+  }
+  else if (mouseX > 10 && mouseX < 150 && mouseY > 350 && mouseY < 370) {
+    printPoints();
+    oldpoints.push(JSON.parse(JSON.stringify(multipoints)));
+    points = [];
+    p2 = [];
+    multipoints = [];
+    done = 0;
+    numPoints = 0;
+    iterations = 0;
   }
   else if ((done === 0) && (pointDist(mouseX, mouseY) === false)) {
     points.push(new p5.Vector(mouseX, mouseY));
@@ -183,6 +194,18 @@ var draw = function () {
     text("Click Print to get vertexes for the shape.", 20,
       100);
   }
+  for (var j = 0; j < oldpoints.length; j++) {
+    var oldshapepoints = oldpoints[j];
+    //stroke(0);
+    noFill();
+    beginShape();
+    for (var oldpt of oldshapepoints) {
+      vertex(oldpt.x, oldpt.y);
+    }
+    vertex(oldshapepoints[0].x, oldshapepoints[0].y);
+    endShape();
+  }
+  fill(255, 0, 0);
   if (done === 0) {
     for (var i = 0; i < points.length; i++) {
       ellipse(points[i].x, points[i].y, 10, 10);
@@ -267,10 +290,12 @@ var draw = function () {
     fill("gray")
   }
   rect(200, 370, 50, 20)
+  rect(10, 350, 140, 20)
   fill(0);
   text("Split Points", 12, 385);
   text("Generate Shape", 92, 385);
   text("Print", 210, 385);
+  text("Print And Add Shape", 12, 365);
   text("Reset", 270, 385);
   text("Toggle Dots", 322, 385);
 };
