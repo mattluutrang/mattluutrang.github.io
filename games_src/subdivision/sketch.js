@@ -241,7 +241,7 @@ var draw = function () {
     vertex(multipoints[0].x, multipoints[0].y);
     endShape();
 
-    if (iterations < 4 && multipoints.length < 500) {
+    if (iterations < 4 && multipoints.length < 250) {
       subdivide();
       iterations++;
     }
@@ -255,7 +255,7 @@ var draw = function () {
     vertex(multipoints[0].x, multipoints[0].y);
     endShape();
 
-    if (iterations < 4 && multipoints.length < 500) {
+    if (iterations < 4 && multipoints.length < 250) {
       subdivide();
       iterations++;
     }
