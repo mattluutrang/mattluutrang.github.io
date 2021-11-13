@@ -1,23 +1,31 @@
-let inventorySelected = 0;
-let mainInventorySquares = [];
+/**
+ * This file represents the game screen where the main game happens
+ **/
+
+let inventorySelected;
+let mainInventorySquares;
 
 let character;
 
 let inventoryButton;
 let menuButton;
 
-let objects = [];
-let enemies = [];
+let objects;
+let enemies;
+let trees;
+let rocks;
+let gameHeight = 2000;
+let gameWidth = 2000;
+let enemySpawner;
 
 function initGameScreenVariables() {
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 5; j++) {
-            objects.push(new Stone(100 + j * 15, 100 + i * 30));
-        }
-        for (let j = 5; j < 10; j++) {
-            objects.push(new Stick(100 + j * 15, 100 + i * 30));
-        }
-    }
+
+    inventorySelected = 0;
+    mainInventorySquares = [];
+    objects = [];
+    enemies = [];
+    trees = [];
+    rocks = [];
 
     let inventoryLeftSpacer = 56;
     let inventoryTopSpacer = 353;
@@ -28,43 +36,25 @@ function initGameScreenVariables() {
     }
 
     mainInventorySquares[0].item = new Sword(mainInventorySquares[0].x, mainInventorySquares[0].y);
-    mainInventorySquares[1].item = new Stone(mainInventorySquares[1].x, mainInventorySquares[1].y);
-    mainInventorySquares[2].item = new Stick(mainInventorySquares[2].x, mainInventorySquares[2].y);
+    mainInventorySquares[1].item = new Ship(mainInventorySquares[1].x, mainInventorySquares[1].y);
+    mainInventorySquares[2].item = new Anchor(mainInventorySquares[2].x, mainInventorySquares[2].y);
+    mainInventorySquares[3].item = new Axe(mainInventorySquares[3].x, mainInventorySquares[3].y);
+    mainInventorySquares[4].item = new Pickaxe(mainInventorySquares[4].x, mainInventorySquares[4].y);
+    mainInventorySquares[5].item = new WoodenWall(mainInventorySquares[5].x, mainInventorySquares[5].y);
+    mainInventorySquares[6].item = new Meat(mainInventorySquares[6].x, mainInventorySquares[6].y);
 
     inventoryButton = new InventoryButton(335, 353);
     menuButton = new MenuButton(335, 368);
 
-    character = new Character(200, 300);
+    tilemap = new TileMap(gameWidth, gameHeight, 500, 500);
 
-    enemies.push(new Chicken(200, 250, 15));
-
-
+    // figure out where to spawn a player
+    var spawnTile = tilemap.getSpawnableTile();
+    character = new Character(spawnTile.x, spawnTile.y);
+    enemySpawner = new EnemySpawner(width, height, 0.5, 30);
 }
 
-function drawGameScreen() {
-    // draw ocean background (this will change)
-    stroke('#ADD8E6');
-    fill('#ADD8E6');
-    rect(0, 0, 400, 400);
-    tiles.forEach(tile => tile.draw());
-
-    objects.forEach(object => object.draw());
-
-
-    enemies.forEach(enemy => enemy.draw());
-    enemies.forEach(enemy => enemy.update());
-
-
-    ////////// CHARACTER LOGIC //////////////
-    // draw character
-    character.draw();
-    character.update();
-
-
-    if (character.swordSwingTimer > 0) {
-        character.swordSwingTimer--;
-    }
-
+function drawGameUI() {
     ///////////////////////////////////////
 
     // draw inventory bar
@@ -102,8 +92,93 @@ function drawGameScreen() {
     // draw "to menu" button
     menuButton.draw();
 
-    ////////////// GAME LOGIC HERE ////////////
+    drawHealth(character.health);
+}
 
+function drawHealth(health) {
+    // draw health
+    if (health >= 2) {
+        image(rpgIconSprites[0], 12, 352, 10, 10);
+    }
+    else if (health > 0) {
+        image(rpgIconSprites[1], 12, 352, 10, 10);
+    }
+    else if (health <= 0) {
+        image(rpgIconSprites[2], 12, 352, 10, 10);
+    }
+    if (health >= 4) {
+        image(rpgIconSprites[0], 27, 352, 10, 10);
+    }
+    else if (health > 2) {
+        image(rpgIconSprites[1], 27, 352, 10, 10);
+    }
+    else if (health <= 2) {
+        image(rpgIconSprites[2], 27, 352, 10, 10);
+    }
+    if (health >= 6) {
+        image(rpgIconSprites[0], 12, 367, 10, 10);
+    }
+    else if (health > 4) {
+        image(rpgIconSprites[1], 12, 367, 10, 10);
+    }
+    else if (health <= 4) {
+        image(rpgIconSprites[2], 12, 367, 10, 10);
+    }
+    if (health >= 8) {
+        image(rpgIconSprites[0], 27, 367, 10, 10);
+    }
+    else if (health > 6) {
+        image(rpgIconSprites[1], 27, 367, 10, 10);
+    }
+    else if (health <= 6) {
+        image(rpgIconSprites[2], 27, 367, 10, 10);
+    }
+}
+
+function drawGameScreen() {
+    // draw ocean background (this will change)
+    //stroke('#254d86');
+    fill('#254d86');
+    //fill('black');
+    rect(0, 0, 400, 400);
+    push();
+    // translate the screen so that the character is in the middle
+    translate(width / 2 - character.x, height / 2 - character.y);
+    //tiles.forEach(tile => tile.draw());
+    noStroke();
+    tilemap.draw();
+
+    // draw randomly generated assets
+    trees.forEach(tree => tree.draw());
+    rocks.forEach(rock => rock.draw());
+
+    trees = trees.filter(tree => tree.hits < 3);
+    rocks = rocks.filter(rock => rock.hits < 3);
+
+    objects.forEach(object => object.draw());
+
+
+    enemies.forEach(enemy => enemy.draw());
+    enemies.forEach(enemy => enemy.update());
+    enemies = enemies.filter(enemy => enemy.health > 0);
+
+
+    ////////// CHARACTER LOGIC //////////////
+    // draw character
+    character.draw();
+    character.update(true);
+
+
+    if (character.swordSwingTimer > 0) {
+        character.swordSwingTimer--;
+    }
+    pop();
+
+    /////////// DRAW GAME UI //////////////
+    drawGameUI();
+
+    ////////////// GAME LOGIC HERE ////////////
+    enemySpawner.spawn();
     detectCollisions();
 }
 
@@ -116,36 +191,57 @@ function detectCollisions() {
     }
 
     objects = objects.filter(object => {
-        let collided = checkCollision(object, character);
+        if (isWall(object.name)) {
 
-        // add to inventory
-        if (collided) {
-            let mainInventorySpotFound = false;
-            // put into first main invenory spot open
-            for (let i = 0; i < 9; i++) {
-                if (mainInventorySquares[i].item == null) {
-                    mainInventorySquares[i].item = nameToClass(object.name, mainInventorySquares[i].x, mainInventorySquares[i].y);
-                    mainInventorySpotFound = true;
-                    break;
-                }
-            }
-            // if no spots availabe, put into inventory
-            let inventorySpotFound = false;
-            if (!mainInventorySpotFound) {
-                for (let i = 0; i < 40; i++) {
-                    if (inventorySquares[i].item == null) {
-                        inventorySquares[i].item = nameToClass(object.name, inventorySquares[i].x, inventorySquares[i].y);
-                        inventorySpotFound = true;
+        }
+        else {
+            let collided = checkCollision(object, character);
+            // add to inventory
+            if (collided) {
+                let mainInventorySpotFound = false;
+                // put into first main invenory spot open
+                for (let i = 0; i < 9; i++) {
+                    if (mainInventorySquares[i].item == null) {
+                        mainInventorySquares[i].item = nameToClass(object.name, mainInventorySquares[i].x, mainInventorySquares[i].y);
+                        mainInventorySpotFound = true;
                         break;
                     }
                 }
+                // if no spots availabe, put into inventory
+                let inventorySpotFound = false;
+                if (!mainInventorySpotFound) {
+                    for (let i = 0; i < 40; i++) {
+                        if (inventorySquares[i].item == null) {
+                            inventorySquares[i].item = nameToClass(object.name, inventorySquares[i].x, inventorySquares[i].y);
+                            inventorySpotFound = true;
+                            break;
+                        }
+                    }
+                }
+                if (!mainInventorySpotFound && !inventorySpotFound) {
+                    // TODO:Make custom message instead of alert
+                    //alert("No inventory available");
+
+                }
             }
-            if (!mainInventorySpotFound && !inventorySpotFound) {
-                alert("No inventory available");
+            return !collided;
+        }
+        return true;
+
+    });
+
+    enemies.forEach(enemy => {
+        if (checkCollision(enemy, character)) {
+            if (enemy.attack != 0) {
+                if (character.enemyCollisionTimer == 0) {
+                    character.enemyCollisionTimer = character.enemyCollisionTimerLength;
+                    character.health -= enemy.attack;
+                    if (character.health <= 0) {
+                        gameState = "gameOver";
+                    }
+                }
             }
         }
-
-        return !collided;
     });
 }
 
@@ -157,6 +253,19 @@ function gameScreenKeyPressedLogic() {
     // swing sword if spacebar is pressed
     if (keyCode == 32 && character.swingTimer == 160) {
         character.swingTimer = 0;
+    }
+    // attempt to use selected item if "z" is pressed
+    if (keyCode == 90) {
+        if (mainInventorySquares[inventorySelected].item != null) {
+            let selectedItem = mainInventorySquares[inventorySelected].item;
+            if (selectedItem.name == "meat") {
+                character.health += 2;
+                if (character.health > 8) {
+                    character.health = 8;
+                }
+                mainInventorySquares[inventorySelected].item = null;
+            }
+        }
     }
     // switch to crafting inventory if "e" is pressed
     if (keyCode == 69) {
@@ -172,20 +281,30 @@ function gameScreenKeyPressedLogic() {
         if (mainInventorySquares[inventorySelected].item != null) {
             let droppedItem = mainInventorySquares[inventorySelected].item;
             mainInventorySquares[inventorySelected].item = null;
-     
+
             if (character.direction == "left") {
-                objects.push(nameToClass(droppedItem.name, character.x - 20, character.y));
+                objects.push(nameToClass(droppedItem.name, character.x - 30, character.y));
             }
             if (character.direction == "right") {
-                objects.push(nameToClass(droppedItem.name, character.x + 10, character.y));
+                objects.push(nameToClass(droppedItem.name, character.x + 15, character.y));
             }
             if (character.direction == "none") {
                 if (character.state == "left") {
-                    objects.push(nameToClass(droppedItem.name, character.x - 20, character.y));
+                    objects.push(nameToClass(droppedItem.name, character.x - 30, character.y));
                 }
                 if (character.state == "right") {
-                    objects.push(nameToClass(droppedItem.name, character.x + 10, character.y)); 
+                    objects.push(nameToClass(droppedItem.name, character.x + 15, character.y));
                 }
+            }
+            let droppedObj = objects[objects.length - 1]
+            if (droppedObj.name == "wooden-wall") {
+                droppedObj.placed = true;
+                let tile = tilemap.getCurrTile(droppedObj.x, droppedObj.y);
+                //Technically need to make it so that we can't just place anywhere
+                // droppedObj.x = tile.x;
+                // droppedObj.y = tile.y;
+                tilemap.wallBounds.push(new TileBoundingBox(droppedObj.x, droppedObj.y, droppedObj.size, droppedObj.size));
+                tile.spawnable = false;
             }
         }
     }

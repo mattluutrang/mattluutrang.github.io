@@ -1,3 +1,8 @@
+/**
+ * This file represents the options screen where the user can change the game's difficulty
+ **/
+
+
 let optionsXButton;
 let optionsDragon;
 let optionsChicken;
@@ -14,7 +19,13 @@ function initOptionsScreenVariables() {
 
 function drawOptionsScreen() {
     if (gameStarted) {
-        tiles.forEach(tile => tile.draw());
+        tilemap.draw();
+    }
+    else {
+        // draw wave background
+        stroke("#639bff");
+        fill("#639bff");
+        rect(0, 0, 400, 400);
     }
 
     // draw instruction screen background
@@ -72,6 +83,11 @@ function drawOptionsScreen() {
 
     // draw the selector boat
     image(boatSprites[0], optionsBoat.x, optionsBoat.y, 30)
+
+    if (!gameStarted) {
+        startInstructionsBubblesLeft.draw(true);
+        startInstructionsBubblesRight.draw(true);
+    }
 }
 
 function optionsScreenClickedLogic() {

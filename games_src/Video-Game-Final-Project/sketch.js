@@ -13,6 +13,8 @@
 let gameState;
 let gameStarted;
 let oneDegree;
+var tilemap;
+let currRandom;
 
 let byteFont;
 function preload() {
@@ -27,12 +29,18 @@ function setup() {
   /**
    * Setup variables
    */
+  let seeds = [0, 1, 2, 42]
+  currRandom = seeds[Math.floor(Math.random() * seeds.length)]
+  randomSeed(currRandom);
+  noiseSeed(currRandom);
   createCanvas(400, 400);
   gameState = "title";
+  //gameState = "detailedInstructions";
   gameStarted = false;
   oneDegree = PI / 180;
 
   /**Initialize variables for each screen */
+  loadSprites();
   initTitleScreenVariables();
   initCraftingScreenVariables();
   initGameScreenVariables();
@@ -40,17 +48,16 @@ function setup() {
   initInstructionsScreenVariables();
   initOptionsScreenVariables();
   initCraftingRecipesScreenVariables();
+  initStartInstructionsScreenVariables();
+  initDetailedInstructionsScreenVariables();
+  initGameOverScreenVariables();
+  initVictoryScreenVariables();
   textFont("Impact");
   textAlign(CENTER, CENTER);
-  loadSprites();
-
-  // create the tileset for the map
-  createRealTileset();
 }
 
 function draw() {
-  background(0, 0, 0, 0);
-  // draw game screen based on gameState variable
+  // draw game screen based on gameState
   if (gameState == "title") {
     drawTitleScreen();
   }
@@ -75,6 +82,15 @@ function draw() {
   }
   else if (gameState == "craftingRecipes") {
     drawCraftingRecipesScreen();
+  }
+  else if (gameState == "detailedInstructions") {
+    drawDetailedInstructionsScreen();
+  }
+  else if (gameState == "gameOver") {
+    drawGameOverScreen();
+  }
+  else if (gameState == "victory") {
+    drawVictoryScreen();
   }
 
   // additional mouse hover logic
@@ -114,6 +130,12 @@ function mouseClicked() {
   }
   else if (gameState == "craftingRecipes") {
     craftingRecipesScreenClickedLogic();
+  }
+  else if (gameState == "detailedInstructions") {
+    detailedInstructionsScreenClickedLogic();
+  }
+  else if (gameState == "gameOver") {
+    gameOverScreenClickedLogic();
   }
 
 }

@@ -1,3 +1,6 @@
+/**
+ * This class represents the stick object which is used for crafting
+ **/
 class Stick {
 
     constructor(x=0, y=0) {
@@ -19,6 +22,6 @@ class Stick {
     draw() {
         stroke("#635341");
         fill("#635341");
-        image(rpgOutsideObjectSprites[1], this.x + 7, this.y + 7, 10, 10);
+        image(rpgOutsideObjectSprites[1], this.x + 5.5, this.y + 5, 15, 15);
     }
 }

@@ -1,13 +1,22 @@
+/**
+ * This file represents the crafting screen where the player can manage their inventory and craft more items
+ **/
+
 let xOffset = 0.0;
 let yOffset = 0.0;
 
-let craftingSquares = [];
-let inventorySquares = [];
-let craftingResultSquare = null;
-let squareClicked = null;
+let craftingSquares;
+let inventorySquares;
+let craftingResultSquare;
+let squareClicked;
 let craftingXButton;
 
 function initCraftingScreenVariables() {
+    craftingSquares = [];
+    inventorySquares = [];
+    craftingResultSquare = null;
+    squareClicked = null;
+
     var craftingLeftSpacer = 75;
     var craftingTopSpacer = 50;
     var craftingSquareWidth = 25;
@@ -28,11 +37,16 @@ function initCraftingScreenVariables() {
         }
     }
 
-    inventorySquares[0].item = new Stick(inventorySquares[0].x, inventorySquares[0].y);
-    inventorySquares[1].item = new Stone(inventorySquares[1].x, inventorySquares[1].y);
-    inventorySquares[2].item = new Stick(inventorySquares[2].x, inventorySquares[2].y);
-    inventorySquares[3].item = new Stone(inventorySquares[3].x, inventorySquares[3].y);
-    inventorySquares[4].item = new Sword(inventorySquares[4].x, inventorySquares[4].y);
+    inventorySquares[0].item = new Anchor(inventorySquares[0].x, inventorySquares[0].y);
+    inventorySquares[1].item = new WoodenWall(inventorySquares[1].x, inventorySquares[1].y);
+    inventorySquares[2].item = new WoodenWall(inventorySquares[2].x, inventorySquares[2].y);
+    inventorySquares[3].item = new WoodenWall(inventorySquares[3].x, inventorySquares[3].y);
+    inventorySquares[4].item = new Wheel(inventorySquares[4].x, inventorySquares[4].y);
+    inventorySquares[5].item = new Sail(inventorySquares[5].x, inventorySquares[5].y);
+    inventorySquares[6].item = new Stick(inventorySquares[6].x, inventorySquares[6].y);
+    inventorySquares[7].item = new Stone(inventorySquares[7].x, inventorySquares[7].y);
+    inventorySquares[8].item = new Feather(inventorySquares[8].x, inventorySquares[8].y);
+    inventorySquares[9].item = new Feather(inventorySquares[9].x, inventorySquares[9].y);
 
     craftingResultSquare = new CraftingSquare(250, 80);
     craftingXButton = new XButton(350, 40);
@@ -107,19 +121,9 @@ function updateCraftingResult() {
         craftingGrid[key] = square.item;
     });
 
-    let craftMade = false;
     // crafing logic, probabably move to a separate function in a separte file later
-    if (craftingGrid["0|1"] != null && craftingGrid["0|1"].name == "stone" &&
-        craftingGrid["1|1"] != null && craftingGrid["1|1"].name == "stone" &&
-        craftingGrid["2|1"] != null && craftingGrid["2|1"].name == "stick") {
-
-        craftingResultSquare.item = new Sword(250, 80);
-        craftMade = true;
-    }
-    
-    if (!craftMade) {
-        craftingResultSquare.item = null;
-    }
+    let craftResult = getCraftingResult(craftingGrid);
+    craftingResultSquare.item = craftResult;
 }
 
 function craftingScreenPressedLogic() {
@@ -152,6 +156,9 @@ function craftingScreenPressedLogic() {
         squareClicked = craftingResultSquare;
         xOffset = mouseX - item.x - item.w;
         yOffset = mouseY - item.y - item.h;
+        if (item.name == "ship") {
+            gameState = "victory";
+        }
     }
 }
 

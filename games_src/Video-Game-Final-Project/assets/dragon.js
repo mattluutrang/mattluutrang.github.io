@@ -1,9 +1,14 @@
-class Dragon {
-    constructor(x, y, size = 20) {
+/**
+ * This class represents the dragonn "boss" mob
+ **/
+class Dragon extends Enemy {
+    constructor(x, y, size = 20, health = 100, attack = 4, speed = 0.1) {
+        super(x, y, size, health, attack, speed);
         this.x = x;
         this.y = y;
         this.size = size;
 
+        this.name = 'dragon';
         this.state = "left";
         this.direction = "left";
         this.yDirection = "none";
@@ -62,7 +67,7 @@ class Dragon {
             else if (this.yDirection != "none") {
                 if (this.state == "left") {
                     image(this.sprites[20 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
-    
+
                 }
                 else if (this.state == "right") {
                     image(this.sprites[16 + floor(this.spriteTimer / 10) % 4], this.x, this.y);

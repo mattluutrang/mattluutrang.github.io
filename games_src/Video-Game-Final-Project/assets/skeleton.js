@@ -1,8 +1,9 @@
-class Skeleton {
-    constructor(x, y, size = 20) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
+/**
+ * This class represents the skeleton mob which drops bones
+ **/
+class Skeleton extends Enemy {
+    constructor(x, y, size = 20, health = 10, attack = 0.5, speed = 0.7) {
+        super(x, y, size, health, attack, speed);
 
         this.state = "left";
         this.direction = "left";
@@ -10,7 +11,7 @@ class Skeleton {
         this.spriteTimer = 0;
         this.turnFrame = 0;
 
-        this.speed = 1;
+        this.name = "skeleton";
 
         // bounding box
         this.boundX = x;
@@ -20,18 +21,35 @@ class Skeleton {
         this.scale = this.size / 20;
 
         this.sprites = skeletonSprites;
-    }
+        this.moveDir = -1;
+        this.switchFrame = 30;
+        this.targetPos;
 
+        this.hurtTimer = 0;
+        this.hurtTimerLength = 60;
+        this.seekDistance = 200;
+    }
 
     draw() {
         // turn from left to right
-
         if (this.stopFlag) {
-            image(this.sprites[20], this.x, this.y);
+            if (this.state == "left") {
+                image(this.sprites[20], this.x, this.y);
+            }
+            else {
+                image(this.sprites[8], this.x, this.y);
+            }
         }
         else {
-
-            if (this.state == "left2right") {
+            if (this.hurtTimer > 2 * this.hurtTimerLength / 3) {
+                if (this.state == "left2right" || this.state == "right") {
+                    image(this.sprites[42], this.x, this.y);
+                }
+                if (this.state == "right2left" || this.state == "left") {
+                    image(this.sprites[46], this.x, this.y);
+                }
+            }
+            else if (this.state == "left2right") {
                 image(this.sprites[29 + this.turnFrame], this.x, this.y);
                 if (floor(this.spriteTimer / 3) % 4 == 0) {
                     this.turnFrame++;
@@ -64,7 +82,7 @@ class Skeleton {
             else if (this.yDirection != "none") {
                 if (this.state == "left") {
                     image(this.sprites[20 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
-    
+
                 }
                 else if (this.state == "right") {
                     image(this.sprites[16 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
@@ -90,6 +108,81 @@ class Skeleton {
 
 
         this.spriteTimer++;
+        if (this.hurtTimer > 0) {
+            this.hurtTimer--;
+        }
+        else {
+            this.hurting = false;
+        }
+    }
+    seekPlayer() {
+        let separation = new p5.Vector(-this.x + character.x, -this.y + character.y);
+        separation.rotate(this.moveDir * PI / 4);
+        separation.normalize();
+        separation.mult(this.speed);
+        if (frameCount % this.switchFrame == 0) {
+            this.moveDir *= -1;
+        }
+        if (separation.x > 0) {
+            this.state = "right"
+            this.direction = "right";
+            this.right = true;
+            this.left = false;
+        }
+        else if (separation.x < 0) {
+            this.state = "left"
+            this.direction = "left";
+            this.left = true;
+            this.right = false;
+        }
+        else {
+            this.left = false;
+            this.right = false;
+        }
+        if (separation.y > 0) {
+            this.down = true;
+            this.up = false;
+        }
+        else if (separation.y < 0) {
+            this.down = false;
+            this.up = true;
+        }
+        else {
+            this.up = false;
+            this.down = false;
+        }
     }
 
+    
+
+    drawInstructionsScreenSkeleton() {
+        if (this.direction == "left") {
+            image(this.sprites[20 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
+        }
+        if (this.direction == "right") {
+            image(this.sprites[16 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
+        }
+        if (this.direction == "up") {
+            image(this.sprites[20 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
+        }
+        if (this.direction == "down") {
+            image(this.sprites[16 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
+        }
+        this.spriteTimer++;
+    }
+
+    updateStartInstructionsScreenSkeleton() {
+        if (this.x <= 265) {
+            this.direction = "right";
+        }
+        if (this.x >= 340) {
+            this.direction = "left";
+        }
+        if (this.direction == "left") {
+            this.x--;
+        }
+        if (this.direction == "right") {
+            this.x++;
+        }
+    }
 }

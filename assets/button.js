@@ -1,3 +1,6 @@
+/**
+ * This class represents an button
+ **/
 class Button {
     constructor(x, y, width, height, fill, text, textSize, textFill = "black", textFont = "Impact") {
         this.x = x;

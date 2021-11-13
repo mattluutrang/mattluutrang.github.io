@@ -1,32 +1,20 @@
-let condensedTileset;
 let expandedTileset;
-let tiles = [];
 
 
+let stringReps = ['y', 'w', 'o', 'g', 'wwwo', 'vwo', 'wwoo', 'wwow', 'ooow', 'oowo', 'oooy', 'voy', 'ooyy', 'ooyo', 'yyyo', 'yyoy', 'yyyg', 'vyg', 'yygg', 'yygy', 'gggy', 'ggyg', 'wo', 'wowo', 'ow', 'owow', 'owoo', 'wooo', 'oy', 'oyoy', 'yo', 'yoyo', 'yoyy', 'oyyy', 'yg', 'ygyg', 'gy', 'gygy', 'gygg', 'yggg', 'woww', 'vow', 'ooww', 'owww', 'owwo', 'woow', 'oyoo', 'vyo', 'yyoo', 'yooo', 'yooy', 'oyyo', 'ygyy', 'vgy', 'ggyy', 'gyyy', 'gyyg', 'yggy'];
+let numReps = [0, 1, 3, 4, 19, 20, 20, 21, 22, 23, 25, 26, 26, 27, 28, 29, 31, 32, 32, 33, 34, 35, 37, 37, 39, 39, 40, 41, 43, 43, 45, 45, 46, 47, 49, 49, 51, 51, 52, 53, 55, 56, 56, 57, 58, 59, 61, 62, 62, 63, 64, 65, 67, 68, 68, 69, 70, 71]
 // create the tileset map
 // because of the way our tile assets work,
 // the tileset must be expanded first as so:
-// x x x 
+// x x x
 // o o o
-// turns to 
+// turns to
 // x - x - x
 // - - - - -
 // o - o - o
 // the gaps are then filled in with the correct tiles
-function createRealTileset() {
-    condensedTileset = [
-        ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
-        ['w', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'w'],
-        ['w', 'o', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'g', 'g', 'g', 'g', 'g', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'g', 'g', 'g', 'g', 'g', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'g', 'g', 'g', 'g', 'g', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'g', 'g', 'g', 'g', 'g', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'g', 'g', 'g', 'g', 'g', 'y', 'o', 'w'],
-        ['w', 'o', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'o', 'w'],
-        ['w', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'w'],
-        ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w']
-    ];
+function createRealTileset(condensedTileset, x_offset = 0, y_offset = 0) {
+    let tiles = [];
     expandedTileset = [];
     // init empty expanded tileset
     let placeholder = [];
@@ -78,15 +66,15 @@ function createRealTileset() {
                     expandedTileset[i][j] = expandedTileset[i - 1][j + 1];
                 }
                 else {
-                    expandedTileset[i][j] = expandedTileset[i - 1][j - 1] + 
-                                            expandedTileset[i - 1][j + 1] + 
-                                            expandedTileset[i + 1][j - 1] +
-                                            expandedTileset[i + 1][j + 1];
+                    expandedTileset[i][j] = expandedTileset[i - 1][j - 1] +
+                        expandedTileset[i - 1][j + 1] +
+                        expandedTileset[i + 1][j - 1] +
+                        expandedTileset[i + 1][j + 1];
                 }
             }
         }
     }
-    
+
     // print out for testing
     for (let i = 0; i < expandedTileset.length; i++) {
         let str = "";
@@ -97,22 +85,37 @@ function createRealTileset() {
 
     for (let i = 0; i < expandedTileset.length; i++) {
         for (let j = 0; j < expandedTileset[0].length; j++) {
+            let hasWater = expandedTileset[i][j].indexOf("w") != -1;
             let imageIndex = stringToBeachTileIndex(expandedTileset[i][j]);
-            tiles.push(new Tile(j * 20, i * 20, imageIndex));
+            tiles.push(new Tile(j * 20 + x_offset, i * 20 + y_offset, imageIndex, hasWater));
         }
     }
 
-    
+
     for (let i = 0; i < condensedTileset.length; i++) {
         let str = "";
         for (let j = 0; j < condensedTileset[0].length; j++) {
             str += condensedTileset[i][j] + ","
         }
     }
+
+    return tiles;
+}
+
+
+function mapStringToBeachTileIndex(str) {
+    let idx = stringReps.indexOf(str);
+    return numReps[idx];
+}
+
+function mapNumToBeachTileString(num) {
+    let idx = numReps.indexOf(num);
+    return stringReps[idx];
 }
 
 // map the tile string to the correct asset index
 function stringToBeachTileIndex(str) {
+    let dict = {}
     if (str == 'y') {
         return 0;
     }
@@ -158,7 +161,7 @@ function stringToBeachTileIndex(str) {
     if (str == 'yyyg') {
         return 31;
     }
-    if (str == 'vyg' || str =='yygg') {
+    if (str == 'vyg' || str == 'yygg') {
         return 32;
     }
     if (str == 'yygy') {

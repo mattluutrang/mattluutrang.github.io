@@ -1,3 +1,7 @@
+/**
+ * This file represents the instructions screen that displays the game's instructions and controls
+ **/
+
 let instructionsXButton;
 let instructionsOrc;
 let instructinosChicken;
@@ -9,8 +13,8 @@ function initInstructionsScreenVariables() {
 }
 
 function drawInstructionsScreen() {
-    tiles.forEach(tile => tile.draw());
 
+    tilemap.draw();
     // draw instructkion screen background
     stroke('#5B270B');
     fill('#5B270B');
@@ -45,10 +49,18 @@ function drawInstructionsScreen() {
     fill(200);
     textSize(9);
     strokeWeight(0);
-    text("Welcome to Island Explorer!", 200, 100);
-    text("You are stranded on an island with seemingly no way off.", 200, 115);
-    text("Fend off enemies and collect resources to unlock crafting recipes.", 200, 130);
-    text("Once you have crafted enough materials, craft a boat to get off the island.", 200, 145);
+    text("Welcome to Island Explorer!", 200, 85);
+    text("You are stranded on an island with seemingly no way off.", 200, 100);
+    text("Fend off enemies and collect resources to unlock crafting recipes.", 200, 115);
+    text("Once you have crafted enough materials, craft a boat to get off the island.", 200, 130);
+
+    // more Instructions button
+    image(woodImg, 175, 140, 50, 20);
+    stroke(0);
+    fill("#f5712a")
+    strokeWeight(1);
+    textSize(12);
+    text("More", 200, 150);
 
     // draw controls header
     stroke(240);
@@ -71,14 +83,26 @@ function drawInstructionsScreen() {
 
 function instructionsScreenClickedLogic() {
     if (instructionXClicked()) {
-        gameState = "menu"
+        gameState = "menu";
+    }
+    if (instructionsMoreClicked()) {
+        gameState = "detailedInstructions";
     }
 }
 
 function instructionXClicked() {
-    if (mouseX >= menuXButton.x && mouseY >= menuXButton.y && 
+    if (mouseX >= menuXButton.x && mouseY >= menuXButton.y &&
         mouseX <= menuXButton.x + menuXButton.w &&
         mouseY <= menuXButton.y + menuXButton.h) {
+        return true;
+    }
+    return false;
+}
+
+function instructionsMoreClicked() {
+    if (mouseX >= 175 && mouseY >= 140 &&
+        mouseX <= 175 + 50 &&
+        mouseY <= 140 + 20) {
         return true;
     }
     return false;

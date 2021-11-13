@@ -1,3 +1,6 @@
+/**
+ * This class represents the stone object which is used for crafting
+ **/
 class Stone {
 
     constructor(x=0, y=0) {

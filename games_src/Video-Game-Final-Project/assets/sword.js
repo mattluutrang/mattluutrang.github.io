@@ -1,3 +1,6 @@
+/**
+ * This class represents the sword object which is used for attacking mobs
+ **/
 class Sword {
 
     constructor(x=0, y=0) {

@@ -1,3 +1,7 @@
+/**
+ * This file represents the menu screen where the user can navigate to the options, instructions, and crafting recipe screens
+ **/
+
 let menuXButton;
 
 function initMenuScreenVariables() {
@@ -5,8 +9,7 @@ function initMenuScreenVariables() {
 }
 
 function drawMenuScreen() {
-    tiles.forEach(tile => tile.draw());
-
+    tilemap.draw();
     // draw menu screen background
     stroke('#5B270B');
     fill('#5B270B');
