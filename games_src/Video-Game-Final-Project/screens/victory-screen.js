@@ -22,7 +22,7 @@ function initVictoryScreenVariables() {
     victoryCharacter.direction = "none"
     playButton = new Button(150, 200, 100, 40, "#E5CD6C", "Play", 20, "#f5712a", byteFont);
     victoryWaveHeight = 7.2 * height / 8;
-    victoryBoat = new Boat(40, 6.6 * height / 8, 40, true, 0.25);
+    victoryBoat = new Boat(140, 6.6 * height / 8, 40, true, 0.25);
     startVictoryTime = frameCount;
 }
 
