@@ -43,7 +43,7 @@ function drawGameOverScreen() {
     let h = 11;
     let mul = 2;
     image(deadMHeroImg, deadX, deadY, w * mul, h * mul);
-    
+
     gameOverOrc1.draw();
     gameOverOrc2.draw();
     if (deadTwitchTimer < 5) {
@@ -52,19 +52,19 @@ function drawGameOverScreen() {
     else if (deadTwitchTimer < 10) {
         deadX++;
     }
-    if (deadTwitchTimer >= 15 && deadTwitchTimer < 20){
+    if (deadTwitchTimer >= 15 && deadTwitchTimer < 20) {
         gameOverOrc1.y++;
     }
-    if (deadTwitchTimer >= 20 && deadTwitchTimer < 25){
+    if (deadTwitchTimer >= 20 && deadTwitchTimer < 25) {
         gameOverOrc1.y--;
     }
-    if (deadTwitchTimer >= 30 && deadTwitchTimer < 35){
+    if (deadTwitchTimer >= 30 && deadTwitchTimer < 35) {
         gameOverOrc2.y++;
     }
-    if (deadTwitchTimer >= 35 && deadTwitchTimer < 40){
+    if (deadTwitchTimer >= 35 && deadTwitchTimer < 40) {
         gameOverOrc2.y--;
     }
-    
+
     if (deadTwitchTimer == 0) {
         deadTwitchTimer = deadTwitchTimerLength
     }
@@ -84,6 +84,9 @@ function drawGameOverScreen() {
 function gameOverScreenClickedLogic() {
     if (playAgainClicked()) {
         gameState = "game";
+        currRandom = seeds[Math.floor(Math.random() * seeds.length)];
+        randomSeed(currRandom);
+        noiseSeed(currRandom);
         initCraftingScreenVariables();
         initGameScreenVariables();
     }

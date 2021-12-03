@@ -33,6 +33,11 @@ class Rock {
             this.shake();
         }
         if (this.hits == 3) {
+            // mine rock objective completed
+            rocksMined++;
+            if (objectiveNum == 4) {
+                objectiveNum++;
+            }
             objects.push(new Stone(this.x + 8, this.y + 8));
         }
     }

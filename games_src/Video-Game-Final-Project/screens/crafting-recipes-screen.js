@@ -11,7 +11,9 @@ function initCraftingRecipesScreenVariables() {
 }
 
 function drawCraftingRecipesScreen() {
-    tilemap.draw();
+    if (prevGameState == "crafting") {
+        sunsetBackground();
+    }
     // draw instructkion screen background
     stroke('#5B270B');
     fill('#5B270B');
@@ -65,7 +67,8 @@ function drawCraftingRecipesScreen() {
 
 function craftingRecipesScreenClickedLogic() {
     if (craftingRecipeXClicked()) {
-        gameState = "menu"
+        //gameState = "menu"
+        gameState = prevGameState;
     }
     if (leftButtonClicked() && craftingPageIndex > 0) {
         craftingPageIndex -= 2;

@@ -1,6 +1,8 @@
-// Constants
-const Y_AXIS = 1;
-const X_AXIS = 2;
+/**
+ * This file contains useful utility functions for methods in the game, that have been reused from
+ * other projects.
+ */
+
 
 function gen_area_noise(x, y, width, height, k) {
     translate(x, y);
@@ -44,7 +46,22 @@ function setGradient(x, y, w, h, c1, c2, axis) {
     }
 }
 
+function sunsetBackground() {
+    /**
+     * Method to create a sunset background
+     */
+    let c2 = color("#eb8c3d");
+    let c1 = color("#3ebfea");
+    strokeWeight(1);
+    setGradient(0, 0, width, height, c1, c2, Y_AXIS);
+}
+
 function indexes(source, find) {
+    /**
+     * Method to find the indexes of a value in an array
+     * Credit to:
+     * https://stackoverflow.com/
+     */
     if (!source) {
         return [];
     }

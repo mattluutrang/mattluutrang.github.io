@@ -10,23 +10,17 @@ let detailedInstructionsRock;
 
 function initDetailedInstructionsScreenVariables() {
     detailedInstructionsXButton = new XButton(350, 40);
-    detailedInstructionsWoodenWall = new WoodenWall(310, 252);
+    detailedInstructionsWoodenWall = new WoodenWall(330, 252);
     detailedInstructionsBoat = new Boat(100, 350, 15, true);
     detailedInstructionsTree = new Tree(90, 105);
     detailedInstructionsRock = new Rock(315, 95);
 }
 
 function drawDetailedInstructionsScreen() {
-
-    if (gameStarted) {
-        tilemap.draw();
-    }
-    else {
-        // draw wave background
-        stroke("#639bff");
-        fill("#639bff");
-        rect(0, 0, 400, 400);
-    }
+    // draw wave background
+    stroke("#639bff");
+    fill("#639bff");
+    rect(0, 0, 400, 400);
 
 
     // draw instructkion screen background
@@ -58,7 +52,7 @@ function drawDetailedInstructionsScreen() {
     strokeWeight(0);
     text("Detailed Instructions", 200, 60);
 
-    
+
     var inst_strs = [
         "Use a tool by pressing the spacebar",
         "Use a pickaxe to mine rocks",
@@ -67,7 +61,7 @@ function drawDetailedInstructionsScreen() {
         "Press 'x' to drop any item",
         "Press 'x' to place a wooden wall as a barrier",
         "Press 'z' to eat meat and restore health",
-        "Craft a ship and place it to move on to the next island",
+        "Craft a ship and place it to get off the island and win",
     ]
     let startX = 200;
     let startY = 90;
@@ -84,7 +78,7 @@ function drawDetailedInstructionsScreen() {
     detailedInstructionsWoodenWall.draw();
     image(meatImg, 310, 290);
 
-    
+
     detailedInstructionsBoat.draw();
     detailedInstructionsBoat.update();
     detailedInstructionsBoat.checkBorders();

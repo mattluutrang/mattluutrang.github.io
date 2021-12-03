@@ -20,7 +20,7 @@ class Chicken extends Enemy {
 
         // bounding box
         this.boundX = x;
-        this.bounyY = y;
+        this.boundY = y;
         this.boundW = 12;
         this.boundH = 18;
 
@@ -39,6 +39,9 @@ class Chicken extends Enemy {
 
             }
             else if (this.direction == "right") {
+                image(chickenSprites[floor(this.spriteTimer / 8) % 4], this.x, this.y, this.w, this.h);
+            }
+            else {
                 image(chickenSprites[floor(this.spriteTimer / 8) % 4], this.x, this.y, this.w, this.h);
             }
         }
@@ -79,23 +82,6 @@ class Chicken extends Enemy {
             this.down = false;
         }
     }
-    // update() {
-    //     if (this.direction == "left") {
-    //         this.x--;
-    //     }
-    //     else if (this.direction == "right") {
-    //         this.x++;
-    //     }
-    //     if (this.x >= 300) {
-    //         this.direction = "left";
-    //     }
-    //     if (this.x <= 100) {
-    //         this.direction = "right";
-    //     }
-    //     // update bounding box
-    //     this.boundX = this.x;
-    //     this.boundY = this.y;
-    // }
 
     drawInstructionsScreenChicken() {
         if (this.direction == "left") {

@@ -13,8 +13,6 @@ function initInstructionsScreenVariables() {
 }
 
 function drawInstructionsScreen() {
-
-    tilemap.draw();
     // draw instructkion screen background
     stroke('#5B270B');
     fill('#5B270B');

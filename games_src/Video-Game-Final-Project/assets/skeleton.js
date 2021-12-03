@@ -2,7 +2,7 @@
  * This class represents the skeleton mob which drops bones
  **/
 class Skeleton extends Enemy {
-    constructor(x, y, size = 20, health = 10, attack = 0.5, speed = 0.7) {
+    constructor(x, y, size = 20, health = 10, attack = 0.5, speed = 1) {
         super(x, y, size, health, attack, speed);
 
         this.state = "left";
@@ -22,12 +22,13 @@ class Skeleton extends Enemy {
 
         this.sprites = skeletonSprites;
         this.moveDir = -1;
-        this.switchFrame = 30;
+        this.switchFrame = 40;
         this.targetPos;
 
         this.hurtTimer = 0;
         this.hurtTimerLength = 60;
-        this.seekDistance = 200;
+        this.seekDistance = 150;
+        this.startFrame = frameCount;
     }
 
     draw() {
@@ -54,7 +55,7 @@ class Skeleton extends Enemy {
                 if (floor(this.spriteTimer / 3) % 4 == 0) {
                     this.turnFrame++;
                 }
-                if (this.turnFrame == 3) {
+                if (this.turnFrame >= 3) {
                     this.state = "right";
                     this.spriteTimer = 0;
                 }
@@ -65,7 +66,7 @@ class Skeleton extends Enemy {
                 if (floor(this.spriteTimer / 3) % 4 == 0) {
                     this.turnFrame++;
                 }
-                if (this.turnFrame == 3) {
+                if (this.turnFrame >= 3) {
                     this.state = "left";
                     this.spriteTimer = 0;
                 }
@@ -120,17 +121,24 @@ class Skeleton extends Enemy {
         separation.rotate(this.moveDir * PI / 4);
         separation.normalize();
         separation.mult(this.speed);
-        if (frameCount % this.switchFrame == 0) {
+        if ((frameCount - this.startFrame) % this.switchFrame == 0) {
             this.moveDir *= -1;
         }
-        if (separation.x > 0) {
+        let prev_state = this.state;
+        if (separation.x > 0.1) {
             this.state = "right"
+            if (prev_state === "left") {
+                this.state = "left2right";
+            }
             this.direction = "right";
             this.right = true;
             this.left = false;
         }
-        else if (separation.x < 0) {
+        else if (separation.x < -0.1) {
             this.state = "left"
+            if (prev_state === "right") {
+                this.state = "right2left";
+            }
             this.direction = "left";
             this.left = true;
             this.right = false;
@@ -139,11 +147,11 @@ class Skeleton extends Enemy {
             this.left = false;
             this.right = false;
         }
-        if (separation.y > 0) {
+        if (separation.y > 0.1) {
             this.down = true;
             this.up = false;
         }
-        else if (separation.y < 0) {
+        else if (separation.y < -0.1) {
             this.down = false;
             this.up = true;
         }
@@ -153,7 +161,7 @@ class Skeleton extends Enemy {
         }
     }
 
-    
+
 
     drawInstructionsScreenSkeleton() {
         if (this.direction == "left") {

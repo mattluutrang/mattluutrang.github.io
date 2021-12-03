@@ -120,6 +120,8 @@ function drawStartInstructionsScreen() {
 function startInstructionsScreenClickedLogic() {
     if (playClicked()) {
         gameState = "game";
+        initCraftingScreenVariables();
+        initGameScreenVariables();
     }
     if (optionsClicked()) {
         gameState = "options";

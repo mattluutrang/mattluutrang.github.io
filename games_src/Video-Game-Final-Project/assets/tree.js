@@ -34,7 +34,13 @@ class Tree {
             this.shake();
         }
         if (this.hits == 3) {
+            // mine tree objective completed
+            treesChopped++;
+            if (objectiveNum == 2) {
+                objectiveNum++;
+            }
             objects.push(new Stick(this.x + 25, this.y + 25));
+            objects.push(new Stick(this.x + 10, this.y + 25));
         }
     }
 

@@ -49,6 +49,21 @@ function nameToClass(name, x, y) {
     else if (name == "ship") {
         return new Ship(x, y);
     }
+    else if (name == "dragon") {
+        return new Dragon(x, y);
+    }
+    else if (name == "necromancer") {
+        return new Necromancer(x, y);
+    }
+    else if (name == "ghost") {
+        return new Ghost(x, y);
+    }
+    else if (name == "dragonhead") {
+        return new DragonHead(x, y);
+    }
+    else {
+        console.error("Unknown name: " + name);
+    }
 }
 
 function isTool(name) {

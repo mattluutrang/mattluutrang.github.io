@@ -10,6 +10,7 @@ let inventorySquares;
 let craftingResultSquare;
 let squareClicked;
 let craftingXButton;
+let craftingRecipesButton;
 
 function initCraftingScreenVariables() {
     craftingSquares = [];
@@ -26,7 +27,7 @@ function initCraftingScreenVariables() {
             craftingSquares.push(new CraftingSquare(craftingLeftSpacer + (j * (craftingSquareWidth + craftingSquareMargin)), craftingTopSpacer + (i * (craftingSquareWidth + craftingSquareMargin)), i, j));
         }
     }
-    
+
     var inventoryLeftSpacer = 50;
     var inventoryTopSpacer = 200;
     var craftingSquareWidth = 25;
@@ -37,6 +38,7 @@ function initCraftingScreenVariables() {
         }
     }
 
+    /*
     inventorySquares[0].item = new Anchor(inventorySquares[0].x, inventorySquares[0].y);
     inventorySquares[1].item = new WoodenWall(inventorySquares[1].x, inventorySquares[1].y);
     inventorySquares[2].item = new WoodenWall(inventorySquares[2].x, inventorySquares[2].y);
@@ -45,23 +47,25 @@ function initCraftingScreenVariables() {
     inventorySquares[5].item = new Sail(inventorySquares[5].x, inventorySquares[5].y);
     inventorySquares[6].item = new Stick(inventorySquares[6].x, inventorySquares[6].y);
     inventorySquares[7].item = new Stone(inventorySquares[7].x, inventorySquares[7].y);
-    inventorySquares[8].item = new Feather(inventorySquares[8].x, inventorySquares[8].y);
+    inventorySquares[8].item = new DragonHead(inventorySquares[8].x, inventorySquares[8].y);
     inventorySquares[9].item = new Feather(inventorySquares[9].x, inventorySquares[9].y);
+    */
 
     craftingResultSquare = new CraftingSquare(250, 80);
     craftingXButton = new XButton(350, 40);
+    // TODO: Replace with book icon button?
+    craftingRecipesButton = new Button(180, 140, 80, 20, "#cba56c", "Recipes", 15,);
 }
 
 function drawCraftingScreen() {
-    //let c1 = color("#ADD8E6")
-    let c2 = color("#eb8c3d");
-    let c1 = color("#3ebfea");
-    strokeWeight(1);
-    setGradient(0, 0, width, height, c1, c2, Y_AXIS);
+    sunsetBackground();
     // draw crafting screen background
     stroke('#997949');
     fill('#997949');
     rect(25, 25, 350, 350);
+
+    // draw trash button
+    image(trashImg, 343, 343, 15, 15);
 
     // draw crafting squares
     craftingSquares.forEach(square => square.draw());
@@ -79,6 +83,9 @@ function drawCraftingScreen() {
     }
     // draw crafting result square
     craftingResultSquare.draw();
+
+    // draw crafting screen buttons
+    craftingRecipesButton.draw();
 
     // draw x button
     craftingXButton.draw();
@@ -120,10 +127,10 @@ function updateCraftingResult() {
         let key = square.i + "|" + square.j;
         craftingGrid[key] = square.item;
     });
-
     // crafing logic, probabably move to a separate function in a separte file later
     let craftResult = getCraftingResult(craftingGrid);
     craftingResultSquare.item = craftResult;
+    image(trashImg, 343, 343, 15, 15);
 }
 
 function craftingScreenPressedLogic() {
@@ -156,6 +163,16 @@ function craftingScreenPressedLogic() {
         squareClicked = craftingResultSquare;
         xOffset = mouseX - item.x - item.w;
         yOffset = mouseY - item.y - item.h;
+
+        if (objectiveNum == 1 && item.name == "axe") {
+            objectiveNum++;
+        }
+        if (objectiveNum == 3 && item.name == "pickaxe") {
+            objectiveNum++;
+        }
+        if (objectiveNum == 5 && item.name == "sword") {
+            objectiveNum++;
+        }
         if (item.name == "ship") {
             gameState = "victory";
         }
@@ -185,6 +202,7 @@ function craftingScreenReleasedLogic() {
                     itemPlaced = true;
                 }
             });
+
             if (!itemPlaced) {
                 squareClicked.item.x = squareClicked.x;
                 squareClicked.item.y = squareClicked.y;
@@ -193,6 +211,7 @@ function craftingScreenReleasedLogic() {
                 craftingSquares.forEach(square => {
                     square.item = null;
                 });
+                objectsCrafted++;
             }
         }
         // if the item is any other square
@@ -226,11 +245,16 @@ function craftingScreenReleasedLogic() {
                     itemPlaced = true;
                 }
             });
+
             if (!itemPlaced) {
                 squareClicked.item.x = squareClicked.x;
                 squareClicked.item.y = squareClicked.y;
             }
             updateCraftingResult();
+
+            if (mouseX >= 343 && mouseY >= 343 && mouseX <= 343 + 15 && mouseY <= 343 + 15) {
+                squareClicked.item = null;
+            }
         }
     }
     squareClicked = null;
@@ -246,12 +270,17 @@ function craftingScreenDraggedLogic() {
 function craftingScreenClickedLogic() {
     if (craftingXClicked()) {
         switchToGame();
+        prevGameState = "crafting"
         gameState = "game";
+    }
+    if (craftingRecipesButton.isClicked()) {
+        prevGameState = "crafting"
+        gameState = "craftingRecipes";
     }
 }
 
 function craftingXClicked() {
-    if (mouseX >= craftingXButton.x && mouseY >= craftingXButton.y && 
+    if (mouseX >= craftingXButton.x && mouseY >= craftingXButton.y &&
         mouseX <= craftingXButton.x + craftingXButton.w &&
         mouseY <= craftingXButton.y + craftingXButton.h) {
         return true;
@@ -336,4 +365,4 @@ class XButton {
 
     }
 }
-    
+

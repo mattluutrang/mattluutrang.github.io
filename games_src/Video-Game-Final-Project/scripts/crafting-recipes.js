@@ -28,7 +28,7 @@ function getCraftingResult(craftingGrid) {
     if (listToGridCheck(null, "stone", null, "bone", "stone", "bone", "stone", "stone", "stone", craftingGrid)) {
         return new Anchor(250, 80);
     }
-    if (listToGridCheck(null, "sail", null, "wheel", "stick", "anchor", "wooden-wall", "wooden-wall", "wooden-wall", craftingGrid)) {
+    if (listToGridCheck("dragonhead", "sail", null, "wheel", "stick", "anchor", "wooden-wall", "wooden-wall", "wooden-wall", craftingGrid)) {
         return new Ship(250, 80);
     }
 

@@ -1,3 +1,7 @@
+/**
+ * This file generates the tileset which can be used to make the tilemap
+ */
+
 let expandedTileset;
 
 

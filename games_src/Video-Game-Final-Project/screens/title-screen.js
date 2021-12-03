@@ -55,6 +55,7 @@ function initTitleScreenVariables() {
     waveHeight = 7.2 * height / 8;
     boat = new Boat(30, 6.6 * height / 8, 40, true, 0.25);
     noiseA = 700;
+    startTime = frameCount;
 }
 
 function drawGameStartAnimation() {
@@ -110,10 +111,10 @@ function drawTitleBackground() {
         }
     }
     if (random(1) < 0.01) {
-        if (titleCharacter.state === "left") {
+        if (titleCharacter.state === "left" && titleCharacter.x > width / 2 - 8) {
             titleCharacter.x -= 2;
         }
-        else {
+        else if (titleCharacter.state === "right" && titleCharacter.x < width / 2 + 8) {
             titleCharacter.x += 2;
         }
     }
@@ -173,7 +174,6 @@ function drawTitleBoxes() {
     // fill(255);
     // text("Play", width / 2, 225);
     playButton.draw();
-    textFont("Impact")
 }
 // TODO: Make this look a lot better
 function drawTitleScreen() {

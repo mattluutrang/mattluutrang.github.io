@@ -1,8 +1,8 @@
 /**
- * This class represents the orc mob which trys to attack the player
+ * This class represents the orc mob which trys to attack the player and drops meat
  **/
 class Orc extends Enemy {
-    constructor(x, y, size = 20, health = 20, attack = 1, speed = 0.8) {
+    constructor(x, y, size = 20, health = 15, attack = 1, speed = 0.8) {
         super(x, y, size, health, attack, speed);
         this.state = "left";
         this.direction = "left";
@@ -25,7 +25,6 @@ class Orc extends Enemy {
         this.hurtTimerLength = 60;
     }
     draw() {
-        push();
         if (this.stopFlag) {
             if (this.state == "left") {
                 image(this.sprites[4], this.x, this.y);
@@ -49,7 +48,7 @@ class Orc extends Enemy {
                 if (floor(this.spriteTimer / 3) % 4 == 0) {
                     this.turnFrame++;
                 }
-                if (this.turnFrame == 3) {
+                if (this.turnFrame >= 3) {
                     this.state = "right";
                     this.spriteTimer = 0;
                 }
@@ -60,7 +59,7 @@ class Orc extends Enemy {
                 if (floor(this.spriteTimer / 3) % 4 == 0) {
                     this.turnFrame++;
                 }
-                if (this.turnFrame == 3) {
+                if (this.turnFrame >= 3) {
                     this.state = "left";
                     this.spriteTimer = 0;
                 }
@@ -107,7 +106,6 @@ class Orc extends Enemy {
         else {
             this.hurting = false;
         }
-        pop();
     }
 
     drawInstructionsScreenOrc() {
@@ -140,7 +138,6 @@ class Orc extends Enemy {
             this.x++;
         }
     }
-
 
     updateInstructionsScreenOrc() {
         if (this.x == 325) {

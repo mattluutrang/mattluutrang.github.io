@@ -8,6 +8,8 @@ let optionsDragon;
 let optionsChicken;
 let optionsSkeleton;
 let optionsBoat;
+let optionsSoundSlider;
+let optionsScreenShown;
 
 function initOptionsScreenVariables() {
     optionsXButton = new XButton(350, 40);
@@ -15,18 +17,24 @@ function initOptionsScreenVariables() {
     optionsSkeleton = new Skeleton(288, 190, 40);
     optionsDragon = new Dragon(288, 265, 40);
     optionsBoat = new p5.Vector(110, 110);
+    optionsEasyButton = new Button(75, 100, 250, 50, "white", "Easy", 30, "green", playerFont, woodImg);
+    optionsMediumButton = new Button(75, 175, 250, 50, "white", "Medium", 30, "yellow", playerFont, woodImg);
+    optionsHardButton = new Button(75, 250, 250, 50, "white", "Hard", 30, "red", playerFont, woodImg);
+    //optionsSoundSlider = new Slider(150, 325, 0, 100, 50, ["white", "blue", "red"], 175);
+    optionsScreenShown = false;
+    optionsSoundSlider = createSlider(0, 100, 100);
+    optionsSoundSlider.hide();
 }
 
 function drawOptionsScreen() {
-    if (gameStarted) {
-        tilemap.draw();
+    if (!optionsScreenShown) {
+        optionsSoundSlider.show();
+        optionsScreenShown = true;
     }
-    else {
-        // draw wave background
-        stroke("#639bff");
-        fill("#639bff");
-        rect(0, 0, 400, 400);
-    }
+    // draw wave background
+    stroke("#639bff");
+    fill("#639bff");
+    rect(0, 0, 400, 400);
 
     // draw instruction screen background
     stroke('#5B270B');
@@ -58,23 +66,11 @@ function drawOptionsScreen() {
     text("Options", 200, 60);
 
     // draw buttons
-    stroke("green");
-    fill("green");
-    image(woodImg, 75, 100, 250, 50);
-    text("Easy", 200, 125);
+    optionsEasyButton.draw();
+    optionsMediumButton.draw();
+    optionsHardButton.draw();
 
-    // draw buttons
-    stroke("yellow");
-    fill("yellow");
-    image(woodImg, 75, 175, 250, 50);
-    text("Medium", 200, 200);
-
-    // draw buttons
-    stroke("red");
-    fill("red");
-    image(woodImg, 75, 250, 250, 50);
-    text("Hard", 200, 275);
-    // draw dragon
+    // draw enemies
     optionsDragon.draw();
     optionsSkeleton.draw();
     optionsChicken.draw();
@@ -82,7 +78,15 @@ function drawOptionsScreen() {
     optionsXButton.draw();
 
     // draw the selector boat
-    image(boatSprites[0], optionsBoat.x, optionsBoat.y, 30)
+    image(boatSprites[0], optionsBoat.x, optionsBoat.y, 30);
+
+    // Draw sound slider stuff
+    textSize(20);
+    optionsSoundSlider.position(150, 325);
+    text("Sound", optionsSoundSlider.x - 40, optionsSoundSlider.y + 10);
+    //optionsSoundSlider.draw();
+    let soundSliderValue = optionsSoundSlider.value();
+    outputVolume(0.01 * soundSliderValue);
 
     if (!gameStarted) {
         startInstructionsBubblesLeft.draw(true);
@@ -92,6 +96,8 @@ function drawOptionsScreen() {
 
 function optionsScreenClickedLogic() {
     if (difficultyOptionClicked() || optionXClicked()) {
+        optionsScreenShown = false;
+        optionsSoundSlider.hide();
         if (gameStarted) {
             gameState = "menu"
         }
@@ -102,19 +108,17 @@ function optionsScreenClickedLogic() {
 }
 
 function difficultyOptionClicked() {
-    if (mouseX >= 75 && mouseY >= 100 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 100 + 50) {
+    // Set difficulty based on constants set in constants.js
+    if (optionsEasyButton.isClicked()) {
+        difficulty = EASY;
         return true;
     }
-    if (mouseX >= 75 && mouseY >= 175 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 175 + 50) {
+    if (optionsMediumButton.isClicked()) {
+        difficulty = MEDIUM;
         return true;
     }
-    if (mouseX >= 75 && mouseY >= 250 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 250 + 50) {
+    if (optionsHardButton.isClicked()) {
+        difficulty = HARD;
         return true;
     }
     return false;
@@ -130,27 +134,21 @@ function optionXClicked() {
 }
 
 function optionsScreenMouseHover() {
-    if (mouseX >= 75 && mouseY >= 100 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 100 + 50) {
+    if (optionsEasyButton.isHovered()) {
         optionsBoat.y = 108;
         optionsChicken.stopFlag = false;
     }
     else {
         optionsChicken.stopFlag = true;
     }
-    if (mouseX >= 75 && mouseY >= 175 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 175 + 50) {
+    if (optionsMediumButton.isHovered()) {
         optionsBoat.y = 183;
         optionsSkeleton.stopFlag = false;
     }
     else {
         optionsSkeleton.stopFlag = true;
     }
-    if (mouseX >= 75 && mouseY >= 250 &&
-        mouseX <= 75 + 250 &&
-        mouseY <= 250 + 50) {
+    if (optionsHardButton.isHovered()) {
         optionsBoat.y = 258;
         optionsDragon.stopFlag = false;
     }

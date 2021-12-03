@@ -136,7 +136,14 @@ class Chunk {
         });
     }
     draw() {
-        this.tiles.forEach(tile => tile.draw());
+        this.tiles.forEach(tile => {
+            if (tile.x <= character.x + width / 2 && tile.x >= character.x - width / 2 - 20 && tile.y <= character.y + height / 2 && tile.y >= character.y - height / 2 - 20) {
+                tile.draw()
+            }
+            else {
+                //console.log("exclude this tile")
+            }
+        });
     }
 }
 /**
@@ -189,7 +196,12 @@ class TileMap {
                 let chunkY = this.currChunkId.y + dirY;
                 if (chunkX >= 0 && chunkX < this.chunksDim[0] && chunkY >= 0 && chunkY < this.chunksDim[1]) {
                     if (this.chunks[chunkX] != undefined && this.chunks[chunkX][chunkY] != undefined) {
-                        this.chunks[chunkX][chunkY].draw();
+                        if (this.chunks[chunkX][chunkY].x <= character.x + width / 2 && this.chunks[chunkX][chunkY].x + width >= character.x - width / 2 && this.chunks[chunkX][chunkY].y <= character.y + height / 2 && this.chunks[chunkX][chunkY].y + height >= character.y - height / 2) {
+                            this.chunks[chunkX][chunkY].draw();
+                        }
+                        else {
+                            //console.log("not in range")
+                        }
                     }
                 }
             }

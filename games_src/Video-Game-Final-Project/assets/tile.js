@@ -17,8 +17,8 @@ class Tile {
         this.x = x;
         this.y = y;
         // Weird lines were appearing when the w and h were only 20
-        this.w = 20.3;
-        this.h = 20.3;
+        this.w = 20.5;
+        this.h = 20.5;
 
         this.imageIndex = imageIndex;
         this.string = mapNumToBeachTileString(imageIndex);

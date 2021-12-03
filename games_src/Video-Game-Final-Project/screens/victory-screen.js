@@ -9,6 +9,12 @@ let victoryCharacter;
 let startVictoryTime;
 let victoryBoat;
 let victoryOrc;
+let victoryTitleButton;
+let creditsButton;
+let statsButton;
+
+let showCredits;
+let showStats;
 
 function initVictoryScreenVariables() {
     victoryWave = [new Wave(3, 180, color("blue")), new Wave(10, 200, color('#639bff')),];
@@ -20,10 +26,15 @@ function initVictoryScreenVariables() {
     victoryOrc = new Orc(width / 2 - 6, 300);
     victoryOrc.stopFlag = true;
     victoryCharacter.direction = "none"
-    playButton = new Button(150, 200, 100, 40, "#E5CD6C", "Play", 20, "#f5712a", byteFont);
+    victoryTitleButton = new Button(125, 150, 150, 40, "#E5CD4C", "Title   Screen", 20, "#f5712a", byteFont);
+    creditsButton = new Button(75, 205, 100, 30, "#E5CD9C", "Credits", 15, "#f5712a", byteFont);
+    statsButton = new Button(225, 205, 100, 30, "#E5CD9C", "Stats", 15, "#f5712a", byteFont);
     victoryWaveHeight = 7.2 * height / 8;
     victoryBoat = new Boat(140, 6.6 * height / 8, 40, true, 0.25);
     startVictoryTime = frameCount;
+
+    showCredits = false;
+    showStats = false;
 }
 
 function drawVictoryBackground() {
@@ -105,19 +116,50 @@ function drawVictoryBoxes() {
     fill("#f5712a");
     text("Victory", width / 2, 75);
 
+    victoryTitleButton.draw();
+    creditsButton.draw();
+    statsButton.draw();
+
     textFont("Impact")
 }
 // TODO: Make this look a lot better
 function drawVictoryScreen() {
     drawVictoryBackground();
     drawVictoryBoxes();
+
+    if (showCredits) {
+        drawCreditsScreen();
+    }
+    if (showStats) {
+        drawStatsScreen();
+    }
 }
 
-// function victoryScreenClickedLogic() {
-//     if (playButton.isClicked()) {
-//         if (!startGameAnimation) {
-//             startGameAnimation = true;
-//             startTime = frameCount;
-//         }
-//     }
-// }
+function victoryXClicked() {
+    if (mouseX >= creditsXButton.x && mouseY >= creditsXButton.y &&
+        mouseX <= creditsXButton.x + creditsXButton.w &&
+        mouseY <= creditsXButton.y + creditsXButton.h) {
+        return true;
+    }
+    return false;
+}
+
+function victoryScreenClickedLogic() {
+    if (victoryTitleButton.isClicked()) {
+        gameState = "title";
+        currRandom = seeds[Math.floor(Math.random() * seeds.length)];
+        randomSeed(currRandom);
+        noiseSeed(currRandom);
+        initTitleScreenVariables();
+    }
+    if (creditsButton.isClicked() && !showCredits && !showStats) {
+        showCredits = true;
+    }
+    if (statsButton.isClicked() && !showCredits && !showStats) {
+        showStats = true;
+    }
+    if (victoryXClicked()) {
+        showCredits = false;
+        showStats = false;
+    }
+}

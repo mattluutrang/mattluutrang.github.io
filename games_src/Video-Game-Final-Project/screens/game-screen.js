@@ -12,20 +12,56 @@ let menuButton;
 
 let objects;
 let enemies;
+let projectiles;
+let swordbeams;
+let spawnFlags;
+let reduceFlags;
+let killCounts;
+let targetKillCounts;
+let enemyCounts;
+let reduceKillCounts;
+let enemyNames;
 let trees;
 let rocks;
 let gameHeight = 2000;
 let gameWidth = 2000;
 let enemySpawner;
+let hardEnemySpawner;
+let enemiesKilled = 0;
+let spawnBoss;
+let difficulty = EASY;
+
+let objectiveNum = 0;
+let objectiveStrings = [];
+
+// stats
+let treesChopped;
+let rocksMined;
+let objectsCrafted;
+let meatEaten;
+let bossKilled;
 
 function initGameScreenVariables() {
-
     inventorySelected = 0;
     mainInventorySquares = [];
     objects = [];
     enemies = [];
+    // chicken, skeleton, orc, necromancer, ghost
+    enemyNames = ['chicken', 'skeleton', 'orc', 'necromancer', 'ghost'];
+    killCounts = [0, 0, 0, 0, 0];
+    spawnFlags = [1, 0, 0, 0, 0];
+    reduceFlags = [0, 0, 0, 0, 0];
+    enemyCounts = [0, 0, 0, 0, 0];
+    targetKillCounts = [5, 5, 5, 5, 5];
+    mobCapsCounts = [15, 5, 5, 5, 5];
+    reduceKillCounts = [20, 10, 20, 5, 5];
+    reduceAmounts = [2, 4, 2, 3, 3];
+    projectiles = [];
+    swordbeams = [];
     trees = [];
     rocks = [];
+    spawnBoss = false;
+    bossKilled = false;
 
     let inventoryLeftSpacer = 56;
     let inventoryTopSpacer = 353;
@@ -35,6 +71,9 @@ function initGameScreenVariables() {
         mainInventorySquares.push(new CraftingSquare(inventoryLeftSpacer + (i * (squareWidth + squareMargin)), inventoryTopSpacer));
     }
 
+    /*
+    mainInventorySquares[0].item = new Sword(mainInventorySquares[0].x, mainInventorySquares[0].y);
+    mainInventorySquares[0].item = new Sword(mainInventorySquares[0].x, mainInventorySquares[0].y);
     mainInventorySquares[0].item = new Sword(mainInventorySquares[0].x, mainInventorySquares[0].y);
     mainInventorySquares[1].item = new Ship(mainInventorySquares[1].x, mainInventorySquares[1].y);
     mainInventorySquares[2].item = new Anchor(mainInventorySquares[2].x, mainInventorySquares[2].y);
@@ -42,6 +81,7 @@ function initGameScreenVariables() {
     mainInventorySquares[4].item = new Pickaxe(mainInventorySquares[4].x, mainInventorySquares[4].y);
     mainInventorySquares[5].item = new WoodenWall(mainInventorySquares[5].x, mainInventorySquares[5].y);
     mainInventorySquares[6].item = new Meat(mainInventorySquares[6].x, mainInventorySquares[6].y);
+    */
 
     inventoryButton = new InventoryButton(335, 353);
     menuButton = new MenuButton(335, 368);
@@ -51,7 +91,49 @@ function initGameScreenVariables() {
     // figure out where to spawn a player
     var spawnTile = tilemap.getSpawnableTile();
     character = new Character(spawnTile.x, spawnTile.y);
-    enemySpawner = new EnemySpawner(width, height, 0.5, 30);
+    enemySpawner = new EnemySpawner(width, height, enemyNames, [0.25, 0.15, 0.18, 0.18, 0.18], [0, 5, 10, 15, 20], mobCapsCounts);
+    bossSpawner = new BossSpawner(width, height);
+    enemiesKilled = 0;
+
+    objectiveNum = 0;
+
+    // GOD MODE
+    /*
+    objectiveNum = 5;
+    character.speed = 10;
+    character.attack = 1;
+    character.health = 100;
+    enemySpawner = new EnemySpawner(width, height, enemyNames, [0.4, 0.4, 0.4, 0.4, 0.4], [0, 5, 10, 15, 20]);
+    */
+
+    objectiveStrings.push("Pick up materials on the ground")
+    objectiveStrings.push("Craft an axe")
+    objectiveStrings.push("Mine a tree using the axe")
+    objectiveStrings.push("Craft a pickaxe")
+    objectiveStrings.push("Mine a rock using the pickaxe")
+    objectiveStrings.push("Craft a sword")
+    objectiveStrings.push("Kill 5 chickens")
+    objectiveStrings.push("Kill 5 skeletons")
+    objectiveStrings.push("Kill 5 orcs")
+    objectiveStrings.push("Kill 5 necromancers")
+    objectiveStrings.push("Kill 5 ghosts")
+    objectiveStrings.push("Kill the dragon")
+    objectiveStrings.push("Get resources to craft a ship!")
+
+    // add intitial starting objects
+    objects.push(new Stone(character.x + 20, character.y + 10));
+    objects.push(new Stone(character.x - 20, character.y - 10));
+    objects.push(new Stone(character.x - 40, character.y + 10));
+    objects.push(new Stone(character.x + 0, character.y - 30));
+    objects.push(new Stone(character.x + 10, character.y + 20));
+    objects.push(new Stick(character.x - 20, character.y + 10));
+    objects.push(new Stick(character.x + 20, character.y - 10));
+
+    // init stats
+    treesChopped = 0;
+    rocksMined = 0;
+    objectsCrafted = 0;
+    meatEaten = 0;
 }
 
 function drawGameUI() {
@@ -93,6 +175,14 @@ function drawGameUI() {
     menuButton.draw();
 
     drawHealth(character.health);
+
+    // draw objective bar
+    fill(0, 0, 0, 150);
+    rect(50, 10, 300, 50);
+
+    textSize(15);
+    fill(255);
+    text(objectiveStrings[objectiveNum], 200, 35);
 }
 
 function drawHealth(health) {
@@ -157,11 +247,37 @@ function drawGameScreen() {
 
     objects.forEach(object => object.draw());
 
-
+    // draw enemies
     enemies.forEach(enemy => enemy.draw());
-    enemies.forEach(enemy => enemy.update());
+    enemies.forEach(enemy => {
+        enemy.update();
+        if (enemy.health <= 0) {
+            enemiesKilled += 1;
+            killCounts[enemyNames.indexOf(enemy.name)]++;
+            enemyCounts[enemyNames.indexOf(enemy.name)]--;
+            if (enemy.name == "dragon" && objectiveNum == 11) {
+                objectiveNum++;
+                objects.push(new DragonHead(enemy.x, enemy.y));
+                bossKilled = true;
+                for (let i = 0; i < killCounts.length; i++) {
+                    enemySpawner.decreaseSpawnRates(i, 2);
+                }
+            }
+        }
+    });
     enemies = enemies.filter(enemy => enemy.health > 0);
 
+    projectiles.forEach(projectile => projectile.draw());
+    projectiles.forEach(projectile => {
+        projectile.update();
+    });
+    projectiles = projectiles.filter(projectile => projectile.active);
+
+    swordbeams.forEach(beam => beam.draw());
+    swordbeams.forEach(beam => {
+        beam.update();
+    });
+    swordbeams = swordbeams.filter(beam => beam.active);
 
     ////////// CHARACTER LOGIC //////////////
     // draw character
@@ -178,8 +294,60 @@ function drawGameScreen() {
     drawGameUI();
 
     ////////////// GAME LOGIC HERE ////////////
-    enemySpawner.spawn();
+    // Update the spawn flags
+    for (let i = 0; i < killCounts.length - 1; i++) {
+        if (i == 0) {
+            objectiveStrings[6 + i] = "Kill " + (5 - killCounts[i]) + " chickens";
+        }
+        if (i == 1) {
+            objectiveStrings[6 + i] = "Kill " + (5 - killCounts[i]) + " skeletons";
+        }
+        if (i == 2) {
+            objectiveStrings[6 + i] = "Kill " + (5 - killCounts[i]) + " orcs";
+        }
+        if (i == 3) {
+            objectiveStrings[6 + i] = "Kill " + (5 - killCounts[i]) + " necromancers";
+        }
+        if (killCounts[i] >= targetKillCounts[i]) {
+            if (objectiveNum == 6 + i) {
+                objectiveNum++;
+            }
+            spawnFlags[i + 1] = 1
+        }
+    }
+    objectiveStrings[6 + 4] = "Kill " + (5 - killCounts[4]) + " ghosts";
+    if (killCounts[killCounts.length - 1] >= targetKillCounts[killCounts.length - 1]) {
+        if (objectiveNum == 6 + 4) {
+            objectiveNum++;
+        }
+        if (!spawnBoss) {
+            bossEntranceSoundEffect.play();
+        }
+        spawnBoss = true;
+    }
+
+    // Once every 10 seconds, check if we should update the spawn rates once a certain amount of each enemies have been killed
+    if (frameCount % 600 == 0) {
+        for (let i = 0; i < killCounts.length; i++) {
+            if (killCounts[i] >= reduceKillCounts[i]) {
+                reduceFlags[i]++;
+                if (reduceFlags[i] == 1) {
+                    enemySpawner.decreaseSpawnRates(i, reduceAmounts[i]);
+                }
+            }
+        }
+    }
+
+    if (spawnBoss) {
+        bossSpawner.spawn();
+    }
+    enemySpawner.spawn(spawnFlags);
     detectCollisions();
+
+    // if collected all objects, increase objective number
+    if (objectiveNum == 0 && objects.length == 0) {
+        objectiveNum++;
+    }
 }
 
 function detectCollisions() {
@@ -198,6 +366,7 @@ function detectCollisions() {
             let collided = checkCollision(object, character);
             // add to inventory
             if (collided) {
+                pickupSoundEffect.play();
                 let mainInventorySpotFound = false;
                 // put into first main invenory spot open
                 for (let i = 0; i < 9; i++) {
@@ -236,6 +405,22 @@ function detectCollisions() {
                 if (character.enemyCollisionTimer == 0) {
                     character.enemyCollisionTimer = character.enemyCollisionTimerLength;
                     character.health -= enemy.attack;
+                    hurtSoundEffect.play();
+                    if (character.health <= 0) {
+                        gameState = "gameOver";
+                    }
+                }
+            }
+        }
+    });
+
+    projectiles.forEach(projectile => {
+        if (projectile.hitCharacter) {
+            if (projectile.attack != 0) {
+                if (character.enemyCollisionTimer == 0) {
+                    character.enemyCollisionTimer = character.enemyCollisionTimerLength;
+                    character.health -= projectile.attack;
+                    hurtSoundEffect.play();
                     if (character.health <= 0) {
                         gameState = "gameOver";
                     }
@@ -251,14 +436,16 @@ function gameScreenKeyPressedLogic() {
         inventorySelected = keyCode - 49;
     }
     // swing sword if spacebar is pressed
-    if (keyCode == 32 && character.swingTimer == 160) {
+    if (keyCode == 32 && character.swingTimer == 160 && isTool(mainInventorySquares[inventorySelected].item.name)) {
         character.swingTimer = 0;
+        swingSoundEffect.play();
     }
     // attempt to use selected item if "z" is pressed
     if (keyCode == 90) {
         if (mainInventorySquares[inventorySelected].item != null) {
             let selectedItem = mainInventorySquares[inventorySelected].item;
             if (selectedItem.name == "meat") {
+                meatEaten++;
                 character.health += 2;
                 if (character.health > 8) {
                     character.health = 8;
@@ -271,6 +458,26 @@ function gameScreenKeyPressedLogic() {
     if (keyCode == 69) {
         switchToCrafting();
         gameState = "crafting"
+    }
+    // throw sword beam if "c" is pressed
+    if (keyCode == 67 && character.swordBeamTimer == 0 && mainInventorySquares[inventorySelected].item.name == "sword" && character.swingTimer == 160) {
+        character.swordBeamTimer = character.swordBeamTimerMax;
+        character.swingTimer = 0;
+        swingSoundEffect.play();
+        if (character.direction == "left") {
+            swordbeams.push(new SwordBeam(character.x - 30, character.y + 8, PI));
+        }
+        if (character.direction == "right") {
+            swordbeams.push(new SwordBeam(character.x + 30, character.y + 8, 0));
+        }
+        if (character.direction == "none") {
+            if (character.state == "left") {
+                swordbeams.push(new SwordBeam(character.x - 30, character.y + 8, PI));
+            }
+            if (character.state == "right") {
+                swordbeams.push(new SwordBeam(character.x + 30, character.y + 8, 0));
+            }
+        }
     }
     // switch to menu screen if "m" is pressed
     if (keyCode == 77) {
@@ -367,7 +574,6 @@ class InventoryButton {
 }
 
 class MenuButton {
-
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -375,7 +581,6 @@ class MenuButton {
         this.w = 40;
         this.h = 10;
     }
-
     draw() {
         // draw button
         stroke('#997949');

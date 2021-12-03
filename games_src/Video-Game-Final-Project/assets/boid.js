@@ -1,5 +1,7 @@
-// Boid class
-// Methods for Separation, Cohesion, Alignment added
+/**
+ * This class represents the boid object that is used in the title and victory screens
+ */
+
 class Boid {
     /**
      * This class contains the boiding behavior and logic for our project. The code was modified
@@ -73,8 +75,11 @@ class Boid {
         return steer;
     }
 
-    // Draw boid as a circle
     draw() {
+        /**
+         * This method was changed from the sample in the p5js website, to instead draw a birdlike
+         * object
+         */
         push();
         translate(this.position.x, this.position.y);
         rotate(this.angle - PI / 2);

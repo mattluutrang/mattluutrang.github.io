@@ -9,7 +9,6 @@ function initMenuScreenVariables() {
 }
 
 function drawMenuScreen() {
-    tilemap.draw();
     // draw menu screen background
     stroke('#5B270B');
     fill('#5B270B');
@@ -33,6 +32,7 @@ function drawMenuScreen() {
     line(370, 370, 375, 375);
 
     // draw menu stuff
+    //textFont(playerFont);
     stroke(255);
     fill(255);
     textSize(30);
@@ -64,15 +64,19 @@ function drawMenuScreen() {
 function menuScreenClickedLogic() {
     if (menuXClicked()) {
         gameState = "game";
+        prevGameState = "menu";
     }
     if (instructionsClicked()) {
         gameState = "instructions";
+        prevGameState = "menu";
     }
     if (menuOptionsClicked()) {
         gameState = "options";
+        prevGameState = "menu";
     }
     if (craftingRecipesClicked()) {
         gameState = "craftingRecipes";
+        prevGameState = "menu";
     }
 }
 

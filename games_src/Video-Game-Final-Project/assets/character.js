@@ -1,5 +1,6 @@
 /**
- * This class represents the playable character
+ * This class represents the playable character, and contains all of the logic for controlling and
+ * interacting with things
  **/
 class Character {
     constructor(x, y) {
@@ -14,7 +15,8 @@ class Character {
         this.spriteTimer = 0;
         this.turnFrame = 0;
 
-        this.speed = 2;
+        this.speed = 1.5;
+        this.attack = 5;
 
         // bounding box
         this.boundX = x;
@@ -37,10 +39,12 @@ class Character {
 
         this.enemyCollisionTimer = 0;
         this.enemyCollisionTimerLength = 60;
+
+        this.swordBeamTimer = 0;
+        this.swordBeamTimerMax = 100;
     }
 
     // states: left, right, left to right, right to left
-
     // 16, 17, 18, 19 = run right
     // 20, 21, 22, 23 = run left
     // 24 = stationary right
@@ -49,6 +53,9 @@ class Character {
     // 29, 30, 31 = left to right
 
     draw() {
+        /**
+         * Draws the character to the screen based on the sprite timer and the state
+         */
         if (this.enemyCollisionTimer > 2 * this.enemyCollisionTimerLength / 3) {
             if (this.state == "left2right" || this.state == "right") {
                 image(characterSprites[34], this.x, this.y);
@@ -126,9 +133,26 @@ class Character {
         else if (this.state == "right" && this.direction == "left") {
             image(characterSprites[16 + floor(this.spriteTimer / 10) % 4], this.x, this.y);
         }
-
-
         this.spriteTimer++;
+
+        if (mainInventorySquares[inventorySelected].item != null && mainInventorySquares[inventorySelected].item.name == "sword" && gameState == "game") {
+            // draw sword beam timer circle
+            fill(85, 136, 200, 75);
+            ellipse(this.x + 6, this.y - 9, 10, 10);
+            stroke(85, 136, 200)
+            strokeWeight(2);
+            noFill();
+            arc(this.x + 6, this.y - 9, 10, 10, -HALF_PI, -HALF_PI + (2 * PI * ((this.swordBeamTimerMax - this.swordBeamTimer) / this.swordBeamTimerMax)));
+            textSize(7);
+            strokeWeight(0);
+            stroke(0);
+            fill(0);
+            text("c", this.x + 6, this.y - 9);
+        }
+
+        if (this.swordBeamTimer > 0) {
+            this.swordBeamTimer--;
+        }
 
         // draw weapon
         if (mainInventorySquares[inventorySelected].item != null && isTool(mainInventorySquares[inventorySelected].item.name)) {
@@ -162,32 +186,12 @@ class Character {
 
                 enemies.forEach(enemy => {
                     if (checkCollision(enemy, weaponsBounds)) {
-                        if (enemy.hurtTimer == 0) {
-                            enemy.hurting = true;
-                            enemy.hurtTimer = enemy.hurtTimerLength;
-                            enemy.health -= 5;
-                            if (enemy.health <= 0) {
-                                if (enemy.name == "orc") {
-                                    objects.push(new Meat(enemy.x, enemy.y));
-                                }
-                                else if (enemy.name == "skeleton") {
-                                    objects.push(new Bone(enemy.x, enemy.y));
-                                }
-                                if (enemy.name == "chicken") {
-                                    objects.push(new Feather(enemy.x, enemy.y));
-                                }
-                            }
-                            enemy.stopMovement();
-                            if (this.state == "left" || this.state == "right2left") {
-                                //enemy.x -= 10;
-                                enemy.knockBackDir = -1;
-                            }
-                            else if (this.state == "right" || this.state == "left2right") {
-                                //enemy.x += 10;
-                                enemy.knockBackDir = 1;
-                            }
-                        }
+                        enemy.wasHit(this.attack);
                     }
+                });
+
+                projectiles.forEach(projectile => {
+                    projectile.projectileCollision(weaponsBounds)
                 });
 
                 // draw weapons
@@ -215,6 +219,9 @@ class Character {
     }
 
     checkTerrainCollision() {
+        /**
+         * Checks if the player is colliding with terrain.
+         */
         var collided_x = false;
         var collided_y = false;
         //check x direction collision
@@ -355,6 +362,9 @@ class Character {
 }
 
 class WeaponBounds {
+    /**
+     * This class represents the bounds of a weapon.
+     */
     constructor(x, y) {
         this.boundX = x;
         this.boundY = y;
