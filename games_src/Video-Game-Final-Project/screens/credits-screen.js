@@ -38,15 +38,26 @@ function drawCreditsScreen() {
     textSize(15);
     fill(220);
     stroke(220);
-    text("Coded by Nathan Moeliono and Matthew Trang <3", 200, 150)
-    text("Music", 200, 200)
+    text("Coded by Nathan Moeliono and Matthew Trang <3", 200, 110)
+    text("Music", 200, 150)
     textSize(10);
-    text("'A Robust Crew' by Darren Curtis", 200, 220)
-    text("'Eternal Sleep' by Darren Curtis", 200, 240)
-    text("'Island Explorer' by Michelle Hong", 200, 260)
+    fill(170);
+    stroke(170);
+    text("'A Robust Crew' by Darren Curtis", 200, 170);
+    text("'Eternal Sleep' by Darren Curtis", 200, 190);
+    text("'Island Explorer' by Michelle Hong", 200, 210);
+
+    fill(220);
+    stroke(220);
+    text("Sprites", 200, 240)
+    textSize(10);
+    fill(170);
+    stroke(170);
+    text("character sprites and tileset by analogStudios", 200, 260)
 
     textSize(15);
-    text("Special Thanks to Dr. Hsiao", 200, 300)
+    fill("gold")
+    text("Special Thanks to Dr. Hsiao", 200, 320)
     // draw x button
     menuXButton.draw();
 }
